@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <html>
+  <head>
+    <title>Calculator</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+     <script src="https://cdn.tailwindcss.com"></script>
+
+  </head>
+  <body>
+    <div id="root"></div>
+  
+    <script type="text/babel">   
+      const { useState, useRef } = React;
+      
+      function Screen({display}) {
+        return(
+          <div 
+          id="display"
+          className="
+            bg-[linear-gradient(180deg,#bfcbb2_0%,#a2b08d_100%)]
+            border-2
+            border-[#333]
+            rounded-[6px]
+            h-20 
+            shadow-[inset_0_2px_4px_rgba(0,0,0,0.3),_0_0_6px_rgba(0,0,0,0.6)]
+            text-right
+            font-mono text-7xl 
+            overflow-hidden 
+            whitespace-nowrap 
+            text-ellipsis
+            ">{display}</div>
+        );
+      }
+      
+      function Buttons({buttons}){
+        return(
+          <div className="grid grid-cols-4 grid-rows-5 gap-2 p-1 bg-white">
+          {buttons.map((button) => {
+          return(
+            <button 
+            id={button.id}
+            className={`
+              btn
+              p-1 col-span-${button.col} 
+              row-span-${button.row} 
+              min-h-[50px] 
+              `}
+            style= {{background: `linear-gradient(145deg, ${button.color1}, ${button.color2})`}}
+            onClick={button.func}
+            >
+              {button.key}
+            </button>
+          )
+          })
+            
+          }
+          </div>
+        );
+      }
+      
+      function App() {
+        const [displayValue, setDisplayValue] = useState("0");
+        const [previousValue, setPreviousValue] = useState(null);
+        const [operator, setOperator] = useState(null);
+        const [waitingForNextValue, setWaitingForNextValue] = useState(false);
+
+        const handleDisplay = (num) => {
+          if (waitingForNextValue) {
+            setDisplayValue(num);
+            setWaitingForNextValue(false);
+          } else {
+            setDisplayValue((prev) => (prev === "0" ? num : prev + num));
+          }
+        };
+
+        const handleClear = () => {
+          setDisplayValue("0");
+          setPreviousValue(null);
+          setOperator(null);
+          setWaitingForNextValue(false);
+        };
+
+        const handleOperator = (op) => {
+          const current = parseFloat(displayValue);
+
+          // if user changes operator (ex: pressed + then -)
+          if (waitingForNextValue && operator !== op) {
+            setOperator(op);
+            return;
+          }
+
+          if (previousValue === null) {
+            setPreviousValue(current);
+          } else if (!waitingForNextValue) {
+            const result = compute(previousValue, current, operator);
+            setPreviousValue(result);
+            setDisplayValue(String(result));
+          }
+
+          setOperator(op);
+          setWaitingForNextValue(true);
+        };
+
+        const compute = (a, b, op) => {
+          switch (op) {
+            case "+": return a + b;
+            case "-": return a - b;
+            case "x": return a * b;
+            case "/": return b !== 0 ? a / b : 0;
+            default: return b;
+          }
+        };
+
+        const handleEquals = () => {
+          if (operator === null || waitingForNextValue) return;
+
+          const current = parseFloat(displayValue);
+          const result = compute(previousValue, current, operator);
+
+          setDisplayValue(String(result));
+          setPreviousValue(result);
+          setOperator(null);
+          setWaitingForNextValue(false);
+        };
+
+        const handleDecimal = () => {
+          if (!displayValue.includes(".")) {
+            setDisplayValue((prev) => prev + ".");
+          }
+        };
+
+        const handleNegative = () => {
+          if (displayValue === "0") return;
+          setDisplayValue((prev) =>
+            prev.startsWith("-") ? prev.slice(1) : "-" + prev
+          );
+        };
+
+        const buttons = [
+          { id: "clear", key: "AC", col: 2, color1: "#b04040", color2: "#8a3232", func: handleClear },
+          { id: "divide", key: "/", color1: "#7e7e7e", color2: "#5c5c5c", func: () => handleOperator("/") },
+          { id: "multiply", key: "x", color1: "#7e7e7e", color2: "#5c5c5c", func: () => handleOperator("x") },
+          { id: "seven", key: "7", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("7") },
+          { id: "eight", key: "8", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("8") },
+          { id: "nine", key: "9", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("9") },
+          { id: "subtract", key: "-", color1: "#7e7e7e", color2: "#5c5c5c", func: () => handleOperator("-") },
+          { id: "four", key: "4", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("4") },
+          { id: "five", key: "5", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("5") },
+          { id: "six", key: "6", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("6") },
+          { id: "add", key: "+", color1: "#7e7e7e", color2: "#5c5c5c", func: () => handleOperator("+") },
+          { id: "one", key: "1", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("1") },
+          { id: "two", key: "2", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("2") },
+          { id: "three", key: "3", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("3") },
+          { id: "equals", key: "=", row: 2, color1: "#105a75", color2: "#0b3e51", func: handleEquals },
+          { id: "negative", key: "+/-", color1: "#7e7e7e", color2: "#5c5c5c", func: handleNegative },
+          { id: "zero", key: "0", color1: "#5c5c5c", color2: "#3a3a3a", func: () => handleDisplay("0") },
+          { id: "decimal", key: ".", color1: "#5c5c5c", color2: "#3a3a3a", func: handleDecimal },
+          
+        ];
+      
+        return(
+          <div className="display-flex flex-column bg-gray-600 w-96 h-auto p-2">
+            <Screen display={displayValue}/>
+            <Buttons buttons={buttons}/>
+          </div>
+        );
+     }
+     
+      ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    </script>
+  </body>
+</html>
+    
+  </body>
+  
+</html>

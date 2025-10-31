@@ -1,0 +1,30 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#root{
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn{
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  box-shadow:
+    2px 2px 5px #0a0a0a,
+    -2px -2px 5px #3a3a3a;
+  font-size: 1.2rem;
+}
+
+.btn:active {
+  box-shadow:
+    inset 2px 2px 5px #0a0a0a,
+    inset -2px -2px 5px #3a3a3a;
+  transform: translateY(1px);
+}
