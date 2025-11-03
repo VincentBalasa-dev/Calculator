@@ -8,6 +8,7 @@ This project was created on **freeCodeCamp** to practice **React hooks**, **stat
 ## 🎯 Purpose
 This project demonstrates building a functional calculator using **React functional components**.
 Users can perform addition, subtraction, multiplication, division, use decimals, toggle negative values, and clear the display in real-time.
+
 ---
 
 ## ⚙️ Features
